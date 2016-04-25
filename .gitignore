@@ -1,4 +1,3 @@
-java/*
 jboss/server/all/deploy/project.ext
 jboss/server/default/deploy/project.ext
 jboss/server/minimal/deploy/project.ext
@@ -16,8 +15,20 @@ jboss/server/minimal/data/**/*
 jboss/server/minimal/work/**/*
 
 # deployed package files #
+##########################
+*.deployed
 
-*.DEPLOYED
+# java #
+########
+.classpath
+.project
+.settings
+.idea
+.metadata
+*.iml
+*.ipr
+
+**/java
 
 # Compiled source #
 ###################
@@ -27,6 +38,10 @@ jboss/server/minimal/work/**/*
 *.exe
 *.o
 *.so
+
+# Backup files #
+################
+**/*~
 
 # Packages #
 ############
