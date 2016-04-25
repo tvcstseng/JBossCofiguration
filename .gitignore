@@ -22,7 +22,8 @@
 *.current
 **/java
 **/instances/jbossa/configuration/standalone_xml_history
-**/jboss-eap-6.4
+**/jboss-eap-6.4/*
+!**/jboss-eap-6.4/custom_modules
 
 # Compiled source #
 ###################
