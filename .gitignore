@@ -28,7 +28,12 @@ jboss/server/minimal/work/**/*
 *.iml
 *.ipr
 
+# JBoss cleanup #
+#################
+*.current
 **/java
+**/instances/jbossa/configuration/standalone_xml_history
+**/jboss-eap-6.4
 
 # Compiled source #
 ###################
