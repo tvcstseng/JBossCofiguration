@@ -1,0 +1,11 @@
+# HTTP address of servlet interface of Productlogic
+#delivery.servlet.url=http://dinotstapp02.nitg.tno.nl:7070/dinoprdservices/order
+#delivery.servlet.url=http://dinodevrmi01.dinonet.lan:7070/dinoprdservices/order
+
+
+scp.login.name=jboss
+scp.login.password=safier
+
+scp.host=dinodevapp15.gdnnet.lan
+scp.host.path=/home/jboss/
+http.host.url=http://dinodds51.dinonet.nl/deliverables/
