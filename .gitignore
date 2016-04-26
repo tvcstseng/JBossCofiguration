@@ -21,9 +21,12 @@
 # JBoss cleanup #
 #################
 *.current
-**/java
+**/logging.properties
 **/instances/jbossa/configuration/standalone_xml_history
-**/instances/jbossa/log/
+**/instances/jbossa/data
+**/instances/jbossa/log
+**/instances/jbossa/tmp
+**/java
 **/jboss-eap-6.4/*
 !**/jboss-eap-6.4/custom_modules
 
