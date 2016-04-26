@@ -3,17 +3,23 @@
 <server xmlns="urn:jboss:domain:1.7">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
+        <extension module="org.jboss.as.cmp"/>
         <extension module="org.jboss.as.connector"/>
         <extension module="org.jboss.as.deployment-scanner"/>
         <extension module="org.jboss.as.ee"/>
         <extension module="org.jboss.as.ejb3"/>
+        <extension module="org.jboss.as.jacorb"/>
+        <extension module="org.jboss.as.jaxr"/>
         <extension module="org.jboss.as.jaxrs"/>
         <extension module="org.jboss.as.jdr"/>
         <extension module="org.jboss.as.jmx"/>
         <extension module="org.jboss.as.jpa"/>
         <extension module="org.jboss.as.jsf"/>
+        <extension module="org.jboss.as.jsr77"/>
         <extension module="org.jboss.as.logging"/>
         <extension module="org.jboss.as.mail"/>
+        <extension module="org.jboss.as.messaging"/>
+        <extension module="org.jboss.as.modcluster"/>
         <extension module="org.jboss.as.naming"/>
         <extension module="org.jboss.as.pojo"/>
         <extension module="org.jboss.as.remoting"/>
@@ -37,6 +43,9 @@
                 </authorization>
             </security-realm>
             <security-realm name="ApplicationRealm">
+                <server-identities>
+                    <secret value="ZWpidXNlcjEyIw=="/>
+                </server-identities>
                 <authentication>
                     <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
                     <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
@@ -80,12 +89,13 @@
     <profile>
         <subsystem xmlns="urn:jboss:domain:logging:1.5">
             <console-handler name="CONSOLE">
-                <level name="INFO"/>
+                <level name="WARN"/>
                 <formatter>
                     <named-formatter name="COLOR-PATTERN"/>
                 </formatter>
             </console-handler>
             <periodic-rotating-file-handler name="FILE" autoflush="true">
+                <level name="DEBUG"/>
                 <formatter>
                     <named-formatter name="PATTERN"/>
                 </formatter>
@@ -111,8 +121,29 @@
             <logger category="jacorb.config">
                 <level name="ERROR"/>
             </logger>
-            <root-logger>
+            <logger category="org.jboss">
                 <level name="INFO"/>
+            </logger>
+            <logger category="org.apache.catalina" use-parent-handlers="true">
+                <level name="INFO"/>
+            </logger>
+            <logger category="nl" use-parent-handlers="true">
+                <level name="ALL"/>
+            </logger>
+            <logger category="org.hibernate" use-parent-handlers="true">
+                <level name="DEBUG"/>
+            </logger>
+            <logger category="javax.xml.bind" use-parent-handlers="true">
+                <level name="INFO"/>
+            </logger>
+            <logger category="com.sun" use-parent-handlers="true">
+                <level name="INFO"/>
+            </logger>
+            <logger category="org.jboss.ejb" use-parent-handlers="true">
+                <level name="DEBUG"/>
+            </logger>
+            <root-logger>
+                <level name="DEBUG"/>
                 <handlers>
                     <handler name="CONSOLE"/>
                     <handler name="FILE"/>
@@ -125,8 +156,10 @@
                 <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
             </formatter>
         </subsystem>
+        <subsystem xmlns="urn:jboss:domain:cmp:1.1"/>
         <subsystem xmlns="urn:jboss:domain:datasources:1.2">
             <datasources>
+<!--
                 <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
                     <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                     <driver>h2</driver>
@@ -135,9 +168,119 @@
                         <password>sa</password>
                     </security>
                 </datasource>
+-->
+                <datasource jta="true" jndi-name="java:jboss/datasources/BroDS" pool-name="BroDS" enabled="true" use-java-context="true" spy="false" use-ccm="true">
+                    <connection-url>${jdbc.BroDS.connection}</connection-url>
+                    <driver>oracle</driver>
+                    <pool>
+                        <allow-multiple-users>false</allow-multiple-users>
+                    </pool>
+                     <security>
+                        <user-name>${jdbc.BroDS.user-name}</user-name>
+                        <password>${jdbc.BroDS.password}</password>
+                     </security>
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
+                        <validate-on-match>false</validate-on-match>
+                        <use-fast-fail>false</use-fast-fail>
+                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
+                    </validation>
+                    <timeout>
+                        <set-tx-query-timeout>false</set-tx-query-timeout>
+                    </timeout>
+                    <statement>
+                        <track-statements>NOWARN</track-statements>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jndi-name="java:jboss/datasources/BroRealmDS" pool-name="BroRealmDS" enabled="true" use-java-context="true">
+                    <connection-url>${jdbc.BroRealmDS.connection}</connection-url>
+                    <driver>oracle</driver>
+                    <security>
+                        <user-name>${jdbc.BroRealmDS.user-name}</user-name>
+                        <password>${jdbc.BroRealmDS.password}</password>
+                    </security>
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
+                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
+                    </validation>
+                </datasource>
+                <datasource jndi-name="java:jboss/datasources/TcDataDS" pool-name="TcDataDS" enabled="true" use-java-context="true">
+                    <connection-url>${jdbc.TcDataDS.connection}</connection-url>
+                    <driver>oracle</driver>
+                    <security>
+                        <user-name>${jdbc.TcDataDS.user-name}</user-name>
+                        <password>${jdbc.TcDataDS.password}</password>
+                    </security>
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
+                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
+                    </validation>
+                </datasource>
+                <datasource jndi-name="java:jboss/datasources/DinoConversionDS" pool-name="DinoConversionDS" enabled="true" use-java-context="true">
+                    <connection-url>${jdbc.DinoConversionDS.connection}</connection-url>
+                    <connection-property name="oracle.jdbc.defaultNChar">
+                        true
+                    </connection-property>
+                    <driver>oracle</driver>
+                    <security>
+                        <user-name>${jdbc.DinoConversionDS.user-name}</user-name>
+                        <password>${jdbc.DinoConversionDS.password}</password>
+                    </security>
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
+                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
+                    </validation>
+                </datasource>
+                <datasource jndi-name="java:jboss/datasources/BlkDS" pool-name="BlkDS" enabled="true" use-java-context="true">
+                    <connection-url>${jdbc.BlkDS.connection}</connection-url>
+                    <driver>oracle</driver>
+                    <security>
+                        <user-name>${jdbc.BlkDS.user-name}</user-name>
+                        <password>${jdbc.BlkDS.password}</password>
+                    </security>
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
+                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
+                    </validation>
+                </datasource>
+                <datasource jndi-name="java:jboss/datasources/MetadataJPA" pool-name="MetadataJPA" enabled="true" use-java-context="true">
+                    <connection-url>${jdbc.fbpii.connection}</connection-url>
+                    <driver>postgres</driver>
+                    <security>
+                        <user-name>${jdbc.fbpii.user-name}</user-name>
+                        <password>${jdbc.fbpii.password}</password>
+                    </security>
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
+                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
+                    </validation>
+                </datasource>
+                <datasource jndi-name="java:jboss/datasources/GdwRealmDS" pool-name="GdwRealmDS" enabled="true" use-java-context="true">
+                    <connection-url>${jdbc.GdwRealmDS.connection}</connection-url>
+                    <driver>oracle</driver>
+                    <security>
+                        <user-name>${jdbc.GdwRealmDS.user-name}</user-name>
+                        <password>${jdbc.GdwRealmDS.password}</password>
+                    </security>
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
+                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
+                    </validation>
+                 </datasource>
+
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+                    </driver>
+                    <driver name="oracle" module="com.oracle.jdbc">
+                        <xa-datasource-class>oracle.jdbc.xa.OracleXADataSource</xa-datasource-class>
+                    </driver>
+                    <driver name="oracle-xa" module="com.oracle.jdbc">
+                        <xa-datasource-class>oracle.jdbc.xa.OracleXADataSource</xa-datasource-class>
+                    </driver>
+                    <driver name="postgres" module="org.postgresql">
+                        <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
                     </driver>
                 </drivers>
             </datasources>
@@ -158,6 +301,10 @@
                 <stateful default-access-timeout="5000" cache-ref="simple"/>
                 <singleton default-access-timeout="5000"/>
             </session-bean>
+            <mdb>
+                <resource-adapter-ref resource-adapter-name="${ejb.resource-adapter-name:hornetq-ra}"/>
+                <bean-instance-pool-ref pool-name="mdb-strict-max-pool"/>
+            </mdb>
             <pools>
                 <bean-instance-pools>
                     <strict-max-pool name="slsb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
@@ -184,6 +331,7 @@
                     <keepalive-time time="100" unit="milliseconds"/>
                 </thread-pool>
             </thread-pools>
+            <iiop enable-by-default="false" use-qualified-name="false"/>
             <default-security-domain value="other"/>
             <default-missing-method-permissions-deny-access value="true"/>
         </subsystem>
@@ -209,6 +357,14 @@
                     <eviction strategy="NONE"/>
                 </local-cache>
             </cache-container>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jacorb:1.4">
+            <orb socket-binding="jacorb" ssl-socket-binding="jacorb-ssl">
+                <initializers transactions="spec" security="identity"/>
+            </orb>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jaxr:1.1">
+            <connection-factory jndi-name="java:jboss/jaxr/ConnectionFactory"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
         <subsystem xmlns="urn:jboss:domain:jca:1.1">
@@ -240,10 +396,86 @@
             <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jsf:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:jsr77:1.0"/>
         <subsystem xmlns="urn:jboss:domain:mail:1.2">
             <mail-session name="default" jndi-name="java:jboss/mail/Default">
                 <smtp-server outbound-socket-binding-ref="mail-smtp"/>
             </mail-session>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:messaging:1.4">
+            <hornetq-server>
+                <persistence-enabled>true</persistence-enabled>
+                <journal-type>NIO</journal-type>
+                <journal-min-files>2</journal-min-files>
+                <connectors>
+                    <netty-connector name="netty" socket-binding="messaging"/>
+                    <netty-connector name="netty-throughput" socket-binding="messaging-throughput">
+                        <param key="batch-delay" value="50"/>
+                    </netty-connector>
+                    <in-vm-connector name="in-vm" server-id="0"/>
+                </connectors>
+                <acceptors>
+                    <netty-acceptor name="netty" socket-binding="messaging"/>
+                    <netty-acceptor name="netty-throughput" socket-binding="messaging-throughput">
+                        <param key="batch-delay" value="50"/>
+                        <param key="direct-deliver" value="false"/>
+                    </netty-acceptor>
+                    <in-vm-acceptor name="in-vm" server-id="0"/>
+                </acceptors>
+                <security-settings>
+                    <security-setting match="#">
+                        <permission type="send" roles="guest"/>
+                        <permission type="consume" roles="guest"/>
+                        <permission type="createNonDurableQueue" roles="guest"/>
+                        <permission type="deleteNonDurableQueue" roles="guest"/>
+                    </security-setting>
+                </security-settings>
+                <address-settings>
+                    <!--default for catch all-->
+                    <address-setting match="#">
+                        <dead-letter-address>jms.queue.DLQ</dead-letter-address>
+                        <expiry-address>jms.queue.ExpiryQueue</expiry-address>
+                        <redelivery-delay>0</redelivery-delay>
+                        <max-size-bytes>10485760</max-size-bytes>
+                        <address-full-policy>PAGE</address-full-policy>
+                        <page-size-bytes>2097152</page-size-bytes>
+                        <message-counter-history-day-limit>10</message-counter-history-day-limit>
+                    </address-setting>
+                </address-settings>
+                <jms-connection-factories>
+                    <connection-factory name="InVmConnectionFactory">
+                        <connectors>
+                            <connector-ref connector-name="in-vm"/>
+                        </connectors>
+                        <entries>
+                            <entry name="java:/ConnectionFactory"/>
+                        </entries>
+                    </connection-factory>
+                    <connection-factory name="RemoteConnectionFactory">
+                        <connectors>
+                            <connector-ref connector-name="netty"/>
+                        </connectors>
+                        <entries>
+                            <entry name="java:jboss/exported/jms/RemoteConnectionFactory"/>
+                        </entries>
+                    </connection-factory>
+                    <pooled-connection-factory name="hornetq-ra">
+                        <transaction mode="xa"/>
+                        <connectors>
+                            <connector-ref connector-name="in-vm"/>
+                        </connectors>
+                        <entries>
+                            <entry name="java:/JmsXA"/>
+                        </entries>
+                    </pooled-connection-factory>
+                </jms-connection-factories>
+                <jms-destinations>
+                    <jms-queue name="CptBatchProcessor">
+                        <entry name="queue/CptBatchProcessor"/>
+                        <entry name="java:/jms/CptBatchProcessor"/>
+                    </jms-queue>
+                </jms-destinations>
+            </hornetq-server>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:naming:1.4">
             <remote-naming/>
@@ -251,6 +483,44 @@
         <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
         <subsystem xmlns="urn:jboss:domain:remoting:1.2">
             <connector name="remoting-connector" socket-binding="remoting" security-realm="ApplicationRealm"/>
+            <outbound-connections>
+                <remote-outbound-connection name="remote-ejb-connection" outbound-socket-binding-ref="remote-ejb-connection" username="ejbuser" security-realm="ApplicationRealm">
+                    <properties>
+                        <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
+                        <property name="SSL_ENABLED" value="false"/>
+                    </properties>
+                </remote-outbound-connection>
+                <remote-outbound-connection name="remote-ejb-tr-ear-connection" outbound-socket-binding-ref="remote-ejb-tr-ear-connection" username="ejbuser" security-realm="ApplicationRealm">
+                    <properties>
+                        <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
+                        <property name="SSL_ENABLED" value="false"/>
+                    </properties>
+                </remote-outbound-connection>
+                <remote-outbound-connection name="remote-ejb-gs-ear-connection" outbound-socket-binding-ref="remote-ejb-gs-ear-connection" username="ejbuser" security-realm="ApplicationRealm">
+                    <properties>
+                        <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
+                        <property name="SSL_ENABLED" value="false"/>
+                    </properties>
+                </remote-outbound-connection>
+                <remote-outbound-connection name="remote-ejb-iscpt-ear-connection" outbound-socket-binding-ref="remote-ejb-iscpt-ear-connection" username="ejbuser" security-realm="ApplicationRealm">
+                    <properties>
+                        <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
+                        <property name="SSL_ENABLED" value="false"/>
+                    </properties>
+                </remote-outbound-connection>
+                <remote-outbound-connection name="remote-ejb-omr-ear-connection" outbound-socket-binding-ref="remote-ejb-omr-ear-connection" username="ejbuser" security-realm="ApplicationRealm">
+                    <properties>
+                        <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
+                        <property name="SSL_ENABLED" value="false"/>
+                    </properties>
+                </remote-outbound-connection>
+                <remote-outbound-connection name="remote-ejb-ibr-ear-connection" outbound-socket-binding-ref="remote-ejb-ibr-ear-connection" username="ejbuser" security-realm="ApplicationRealm">
+                    <properties>
+                        <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
+                        <property name="SSL_ENABLED" value="false"/>
+                    </properties>
+                </remote-outbound-connection>
+            </outbound-connections>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:resource-adapters:1.1"/>
         <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
@@ -276,6 +546,94 @@
                         <policy-module code="Delegating" flag="required"/>
                     </authorization>
                 </security-domain>
+
+                <security-domain name="TestDomain">
+                    <authentication>
+                        <login-module code="org.jboss.security.auth.spi.BaseCertLoginModule" flag="required">
+                            <module-option name="rolesProperties" value="${jboss.server.config.dir}/tst-roles.properties"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
+                <security-domain name="BroWebserviceDomain">
+                    <authentication>
+                        <login-module code="org.jboss.security.auth.spi.DatabaseCertLoginModule" flag="required">
+                            <module-option name="dsJndiName" value="java:jboss/datasources/BroRealmDS"/>
+                            <module-option name="verifier" value="org.jboss.security.auth.certs.AnyCertVerifier"/>
+                            <module-option name="rolesQuery" value="select role_name, 'Roles' from oin_user_role_vw where user_oin IN(select regexp_replace(?, '.*SERIALNUMBER=([0-9]*), .*','\1') from dual)"/>
+                            <module-option name="hashEncoding" value="hex"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
+                <security-domain name="BroWebserviceBasicDomain">
+                    <authentication>
+                        <login-module code="org.jboss.security.auth.spi.DatabaseServerLoginModule" flag="required">
+                            <module-option name="dsJndiName" value="java:jboss/datasources/BroRealmDS"/>
+                            <module-option name="principalsQuery" value="select concat ('BRO_' , ( select user_oin from oin_user_vw where user_oin=?) ) from dual"/>
+                            <module-option name="rolesQuery" value="select role_name,'Roles' from oin_user_role_vw where user_oin=?"/>
+                            <module-option name="hashEncoding" value="BASE64"/>
+                            <module-option name="hashUserPassword" value="false"/>
+                            <module-option name="hashStorePassword" value="true"/>
+                            <module-option name="storeDigestCallback" value="org.jboss.wsf.stack.cxf.security.authentication.callback.UsernameTokenCallback"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
+                <security-domain name="BroDataManagementDomain">
+                    <authentication>
+                        <login-module code="Database" flag="required">
+                            <module-option name="dsJndiName" value="java:jboss/datasources/BroRealmDS"/>
+                            <module-option name="principalsQuery" value="select user_pass from gdn_user_vw where user_name=?"/>
+                            <module-option name="rolesQuery" value="select role_name,'Roles' from gdn_user_role_vw where user_name=?"/>
+                            <module-option name="hashEncoding" value="hex"/>
+                            <module-option name="hashAlgorithm" value="MD5"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
+                <security-domain name="BroPortalDomain">
+                    <authentication>
+                        <login-module code="Database" flag="required">
+                            <module-option name="dsJndiName" value="java:jboss/datasources/BroRealmDS"/>
+                            <module-option name="principalsQuery" value="select user_pass from oin_user_mapping_vw where user_name=?"/>
+                            <module-option name="rolesQuery" value="select role_name,'Roles' from oin_user_role_mapping_vw where user_name=?"/>
+                            <module-option name="hashEncoding" value="hex"/>
+                            <module-option name="hashAlgorithm" value="MD5"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
+                <security-domain name="DinoSecurityDomain">
+                    <authentication>
+                        <login-module code="Database" flag="required">
+                            <module-option name="dsJndiName" value="java:jboss/datasources/TcDataDS"/>
+                            <module-option name="principalsQuery" value="select user_pass from tomcat_users where user_name=?"/>
+                            <module-option name="rolesQuery" value="select role_name,'Roles' from tomcat_user_roles where user_name=?"/>
+                            <module-option name="hashEncoding" value="hex"/>
+                            <module-option name="hashAlgorithm" value="MD5"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
+                <security-domain name="BodemLoketPolicy" cache-type="default">
+                    <authentication>
+                        <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule" flag="required">
+                            <module-option name="usersProperties" value="${jboss.server.config.dir}/blk-users.properties"/>
+                            <module-option name="rolesProperties" value="${jboss.server.config.dir}/blk-roles.properties"/>
+                            <module-option name="hashAlgorithm" value="SHA"/>
+                            <module-option name="hashEncoding" value="BASE64"/>
+                            <module-option name="hashUserPassword" value="false"/>
+                            <module-option name="hashStorePassword" value="true"/>
+                            <module-option name="storeDigestCallback" value="org.jboss.wsf.stack.cxf.security.authentication.callback.UsernameTokenCallback"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
+                <security-domain name="BodemLoketPortal" cache-type="default">
+                    <authentication>
+                        <login-module code="org.jboss.security.auth.spi.DatabaseServerLoginModule" flag="required">
+                            <module-option name="unauthenticatedIdentity" value="anonymousBLKuser"/>
+                            <module-option name="dsJndiName" value="java:jboss/datasources/BlkDS"/>
+                            <module-option name="principalsQuery" value="SELECT login_pwd from BLK_ACCOUNT where login_nm=?"/>
+                            <module-option name="rolesQuery" value="SELECT privilege_type_cd, 'Roles' from BLK_PRIVILEGE where account_dbk IN (select account_dbk from BLK_ACCOUNT where login_nm=?)"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
+
             </security-domains>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
@@ -315,7 +673,12 @@
         <interface name="public">
             <inet-address value="${jboss.bind.address:127.0.0.1}"/>
         </interface>
+        <!-- TODO - only show this if the jacorb subsystem is added  -->
         <interface name="unsecure">
+            <!--
+              ~  Used for IIOP sockets in the standard configuration.
+              ~                  To secure JacORB you need to setup SSL 
+              -->
             <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
         </interface>
     </interfaces>
@@ -326,11 +689,35 @@
         <socket-binding name="ajp" port="8009"/>
         <socket-binding name="http" port="8080"/>
         <socket-binding name="https" port="8443"/>
+        <socket-binding name="jacorb" interface="unsecure" port="3528"/>
+        <socket-binding name="jacorb-ssl" interface="unsecure" port="3529"/>
+        <socket-binding name="messaging" port="5445"/>
+        <socket-binding name="messaging-group" port="0" multicast-address="${jboss.messaging.group.address:231.7.7.7}" multicast-port="${jboss.messaging.group.port:9876}"/>
+        <socket-binding name="messaging-throughput" port="5455"/>
         <socket-binding name="remoting" port="4447"/>
         <socket-binding name="txn-recovery-environment" port="4712"/>
         <socket-binding name="txn-status-manager" port="4713"/>
+        <socket-binding name="A-socket" port="0" multicast-address="${jboss.socket.binding.a-sock.multicast-address:224.0.1.105}" multicast-port="${jboss.socket.binding.a-sock.multicast-port:23364}"/> 
         <outbound-socket-binding name="mail-smtp">
-            <remote-destination host="localhost" port="25"/>
+            <remote-destination host="gdnmail61.gdnnet.lan" port="25"/>
+        </outbound-socket-binding>
+        <outbound-socket-binding name="remote-ejb-tr-ear-connection">
+            <remote-destination host="localhost" port="4447"/>
+        </outbound-socket-binding>
+        <outbound-socket-binding name="remote-ejb-iscpt-ear-connection">
+            <remote-destination host="localhost" port="4447"/>
+        </outbound-socket-binding>
+        <outbound-socket-binding name="remote-ejb-gs-ear-connection">
+            <remote-destination host="localhost" port="4447"/>
+        </outbound-socket-binding>
+        <outbound-socket-binding name="remote-ejb-omr-ear-connection">
+            <remote-destination host="localhost" port="4447"/>
+        </outbound-socket-binding>
+        <outbound-socket-binding name="remote-ejb-ibr-ear-connection">
+            <remote-destination host="localhost" port="4447"/>
+        </outbound-socket-binding>
+        <outbound-socket-binding name="remote-ejb-connection">
+            <remote-destination host="localhost" port="4447"/>
         </outbound-socket-binding>
     </socket-binding-group>
 </server>
