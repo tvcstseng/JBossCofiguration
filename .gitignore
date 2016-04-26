@@ -33,10 +33,6 @@
 **/instances/jbossa/tmp
 **/java
 
-## jboss-eap-6.4 ########
-**/jboss-eap-6.4/*
-!**/jboss-eap-6.4/custom_modules
-
 ## jboss-eap-6.4.7 ########
 **/jboss-eap-6.4.7/*
 !**/jboss-eap-6.4.7/custom_modules
