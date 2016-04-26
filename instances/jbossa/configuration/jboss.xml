@@ -719,4 +719,5 @@
             <remote-destination host="localhost" port="4447"/>
         </outbound-socket-binding>
     </socket-binding-group>
+
 </server>
