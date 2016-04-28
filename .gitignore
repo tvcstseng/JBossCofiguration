@@ -1,12 +1,17 @@
 
 # JBoss deployed package files #
-##########################
+################################
 *.deployed
 *.dodeploy
 *.undeployed
 *.failed
 *.ear
 *.old
+*
+
+# Database passwords #
+######################
+**/instances/jbossa/configuration/local.properties
 
 # java #
 ########
