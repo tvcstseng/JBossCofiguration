@@ -1,0 +1,11 @@
+<module xmlns="urn:jboss:module:1.0" name="nl.broservices.common.security">
+  <resources>
+    <resource-root path="oinloginmodule.jar"/>
+    <resource-root path="nl.broservices.common.security.realm-1.0.0.jar"/>
+  </resources>
+  <dependencies>
+    <module name="sun.jdk"/>
+    <module name="org.picketbox"/>
+    <module name="javaee.api"/>
+  </dependencies>
+</module>
