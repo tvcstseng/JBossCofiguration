@@ -16,5 +16,8 @@ set "JBOSS_LOG=%JBOSS%\log"
 set "JBOSS_DEPLOYMENTS=%JBOSS%\deployments"
 set "JBOSS_LIB=%JBOSS%\lib"
 
-call %JBOSS_HOME%\bin\standalone.bat --debug -Djboss.node.name=%NODE_NAME% -Djboss.server.base.dir=%JBOSS%  -Djboss.server.config.dir=%JBOSS_CONFIGURATION%  -Djboss.server.data.dir=%JBOSS_DATA% -Djboss.server.deploy.dir=%JBOSS_DEPLOYMENTS% -Djboss.server.log.dir=%JBOSS_LOG%  -c=jboss.xml -P=%JBOSS_CONFIGURATION%\local.properties 
+REM *************************************
+REM *** JBoss EAP 6.4.7 - Starting... ***
+REM *************************************
 
+call %JBOSS_HOME%\bin\standalone.bat --debug -Djboss.node.name=%NODE_NAME% -Djboss.server.base.dir=%JBOSS%  -Djboss.server.config.dir=%JBOSS_CONFIGURATION%  -Djboss.server.data.dir=%JBOSS_DATA% -Djboss.server.deploy.dir=%JBOSS_DEPLOYMENTS% -Djboss.server.log.dir=%JBOSS_LOG%  -c=jboss.xml -P=%JBOSS_CONFIGURATION%\local.properties 
