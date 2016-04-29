@@ -26,7 +26,7 @@
 # JBoss cleanup #
 #################
 *.current
-**/logging.properties
+*logging.properties
 **/instances/jbossa/configuration/standalone_xml_history
 **/instances/jbossa/data
 **/instances/jbossa/log
