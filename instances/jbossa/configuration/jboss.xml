@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<server xmlns="urn:jboss:domain:1.7">
+<server xmlns="urn:jboss:domain:1.8">
 
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
@@ -199,57 +199,7 @@
                         <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
                     </validation>
                 </datasource>
-                <datasource jndi-name="java:jboss/datasources/TcDataDS" pool-name="TcDataDS" enabled="true" use-java-context="true">
-                    <connection-url>${jdbc.TcDataDS.connection}</connection-url>
-                    <driver>oracle</driver>
-                    <security>
-                        <user-name>${jdbc.TcDataDS.user-name}</user-name>
-                        <password>${jdbc.TcDataDS.password}</password>
-                    </security>
-                    <validation>
-                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
-                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
-                    </validation>
-                </datasource>
-                <datasource jndi-name="java:jboss/datasources/DinoConversionDS" pool-name="DinoConversionDS" enabled="true" use-java-context="true">
-                    <connection-url>${jdbc.DinoConversionDS.connection}</connection-url>
-                    <connection-property name="oracle.jdbc.defaultNChar">
-                        true
-                    </connection-property>
-                    <driver>oracle</driver>
-                    <security>
-                        <user-name>${jdbc.DinoConversionDS.user-name}</user-name>
-                        <password>${jdbc.DinoConversionDS.password}</password>
-                    </security>
-                    <validation>
-                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
-                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
-                    </validation>
-                </datasource>
-                <datasource jndi-name="java:jboss/datasources/BlkDS" pool-name="BlkDS" enabled="true" use-java-context="true">
-                    <connection-url>${jdbc.BlkDS.connection}</connection-url>
-                    <driver>oracle</driver>
-                    <security>
-                        <user-name>${jdbc.BlkDS.user-name}</user-name>
-                        <password>${jdbc.BlkDS.password}</password>
-                    </security>
-                    <validation>
-                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
-                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
-                    </validation>
-                </datasource>
-                <datasource jndi-name="java:jboss/datasources/MetadataJPA" pool-name="MetadataJPA" enabled="true" use-java-context="true">
-                    <connection-url>${jdbc.fbpii.connection}</connection-url>
-                    <driver>postgres</driver>
-                    <security>
-                        <user-name>${jdbc.fbpii.user-name}</user-name>
-                        <password>${jdbc.fbpii.password}</password>
-                    </security>
-                    <validation>
-                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
-                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
-                    </validation>
-                </datasource>
+                <!-- GeometryServices -->
                 <datasource jndi-name="java:jboss/datasources/GdwRealmDS" pool-name="GdwRealmDS" enabled="true" use-java-context="true">
                     <connection-url>${jdbc.GdwRealmDS.connection}</connection-url>
                     <driver>oracle</driver>
@@ -263,17 +213,11 @@
                     </validation>
                 </datasource>
                 <drivers>
-                    <driver name="h2" module="com.h2database.h2">
-                        <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
-                    </driver>
                     <driver name="oracle" module="com.oracle.jdbc">
                         <xa-datasource-class>oracle.jdbc.xa.OracleXADataSource</xa-datasource-class>
                     </driver>
                     <driver name="oracle-xa" module="com.oracle.jdbc">
                         <xa-datasource-class>oracle.jdbc.xa.OracleXADataSource</xa-datasource-class>
-                    </driver>
-                    <driver name="postgres" module="org.postgresql">
-                        <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
                     </driver>
                 </drivers>
             </datasources>
@@ -488,37 +432,31 @@
         <subsystem xmlns="urn:jboss:domain:remoting:1.2">
             <connector name="remoting-connector" socket-binding="remoting" security-realm="ApplicationRealm"/>
             <outbound-connections>
-                <remote-outbound-connection name="remote-ejb-connection" outbound-socket-binding-ref="remote-ejb-connection" username="ejbuser" security-realm="ApplicationRealm">
+                <remote-outbound-connection name="remote-ejb-tr-ear-connection" outbound-socket-binding-ref="localhost-remote-ejb-connection" username="ejbuser" security-realm="ApplicationRealm">
                     <properties>
                         <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
                         <property name="SSL_ENABLED" value="false"/>
                     </properties>
                 </remote-outbound-connection>
-                <remote-outbound-connection name="remote-ejb-tr-ear-connection" outbound-socket-binding-ref="remote-ejb-tr-ear-connection" username="ejbuser" security-realm="ApplicationRealm">
+                <remote-outbound-connection name="remote-ejb-gs-ear-connection" outbound-socket-binding-ref="localhost-remote-ejb-connection" username="ejbuser" security-realm="ApplicationRealm">
                     <properties>
                         <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
                         <property name="SSL_ENABLED" value="false"/>
                     </properties>
                 </remote-outbound-connection>
-                <remote-outbound-connection name="remote-ejb-gs-ear-connection" outbound-socket-binding-ref="remote-ejb-gs-ear-connection" username="ejbuser" security-realm="ApplicationRealm">
+                <remote-outbound-connection name="remote-ejb-iscpt-ear-connection" outbound-socket-binding-ref="localhost-remote-ejb-connection" username="ejbuser" security-realm="ApplicationRealm">
                     <properties>
                         <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
                         <property name="SSL_ENABLED" value="false"/>
                     </properties>
                 </remote-outbound-connection>
-                <remote-outbound-connection name="remote-ejb-iscpt-ear-connection" outbound-socket-binding-ref="remote-ejb-iscpt-ear-connection" username="ejbuser" security-realm="ApplicationRealm">
+                <remote-outbound-connection name="remote-ejb-omr-ear-connection" outbound-socket-binding-ref="localhost-remote-ejb-connection" username="ejbuser" security-realm="ApplicationRealm">
                     <properties>
                         <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
                         <property name="SSL_ENABLED" value="false"/>
                     </properties>
                 </remote-outbound-connection>
-                <remote-outbound-connection name="remote-ejb-omr-ear-connection" outbound-socket-binding-ref="remote-ejb-omr-ear-connection" username="ejbuser" security-realm="ApplicationRealm">
-                    <properties>
-                        <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
-                        <property name="SSL_ENABLED" value="false"/>
-                    </properties>
-                </remote-outbound-connection>
-                <remote-outbound-connection name="remote-ejb-ibr-ear-connection" outbound-socket-binding-ref="remote-ejb-ibr-ear-connection" username="ejbuser" security-realm="ApplicationRealm">
+                <remote-outbound-connection name="remote-ejb-ibr-ear-connection" outbound-socket-binding-ref="localhost-remote-ejb-connection" username="ejbuser" security-realm="ApplicationRealm">
                     <properties>
                         <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
                         <property name="SSL_ENABLED" value="false"/>
@@ -549,13 +487,6 @@
                     <authorization>
                         <policy-module code="Delegating" flag="required"/>
                     </authorization>
-                </security-domain>
-                <security-domain name="TestDomain">
-                    <authentication>
-                        <login-module code="org.jboss.security.auth.spi.BaseCertLoginModule" flag="required">
-                            <module-option name="rolesProperties" value="${jboss.server.config.dir}/tst-roles.properties"/>
-                        </login-module>
-                    </authentication>
                 </security-domain>
                 <security-domain name="BroWebserviceDomain">
                     <authentication>
@@ -599,40 +530,6 @@
                             <module-option name="rolesQuery" value="select role_name,'Roles' from oin_user_role_mapping_vw where user_name=?"/>
                             <module-option name="hashEncoding" value="hex"/>
                             <module-option name="hashAlgorithm" value="MD5"/>
-                        </login-module>
-                    </authentication>
-                </security-domain>
-                <security-domain name="DinoSecurityDomain">
-                    <authentication>
-                        <login-module code="Database" flag="required">
-                            <module-option name="dsJndiName" value="java:jboss/datasources/TcDataDS"/>
-                            <module-option name="principalsQuery" value="select user_pass from tomcat_users where user_name=?"/>
-                            <module-option name="rolesQuery" value="select role_name,'Roles' from tomcat_user_roles where user_name=?"/>
-                            <module-option name="hashEncoding" value="hex"/>
-                            <module-option name="hashAlgorithm" value="MD5"/>
-                        </login-module>
-                    </authentication>
-                </security-domain>
-                <security-domain name="BodemLoketPolicy" cache-type="default">
-                    <authentication>
-                        <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule" flag="required">
-                            <module-option name="usersProperties" value="${jboss.server.config.dir}/blk-users.properties"/>
-                            <module-option name="rolesProperties" value="${jboss.server.config.dir}/blk-roles.properties"/>
-                            <module-option name="hashAlgorithm" value="SHA"/>
-                            <module-option name="hashEncoding" value="BASE64"/>
-                            <module-option name="hashUserPassword" value="false"/>
-                            <module-option name="hashStorePassword" value="true"/>
-                            <module-option name="storeDigestCallback" value="org.jboss.wsf.stack.cxf.security.authentication.callback.UsernameTokenCallback"/>
-                        </login-module>
-                    </authentication>
-                </security-domain>
-                <security-domain name="BodemLoketPortal" cache-type="default">
-                    <authentication>
-                        <login-module code="org.jboss.security.auth.spi.DatabaseServerLoginModule" flag="required">
-                            <module-option name="unauthenticatedIdentity" value="anonymousBLKuser"/>
-                            <module-option name="dsJndiName" value="java:jboss/datasources/BlkDS"/>
-                            <module-option name="principalsQuery" value="SELECT login_pwd from BLK_ACCOUNT where login_nm=?"/>
-                            <module-option name="rolesQuery" value="SELECT privilege_type_cd, 'Roles' from BLK_PRIVILEGE where account_dbk IN (select account_dbk from BLK_ACCOUNT where login_nm=?)"/>
                         </login-module>
                     </authentication>
                 </security-domain>
@@ -700,22 +597,7 @@
         <outbound-socket-binding name="mail-smtp">
             <remote-destination host="gdnmail61.gdnnet.lan" port="25"/>
         </outbound-socket-binding>
-        <outbound-socket-binding name="remote-ejb-tr-ear-connection">
-            <remote-destination host="localhost" port="4447"/>
-        </outbound-socket-binding>
-        <outbound-socket-binding name="remote-ejb-iscpt-ear-connection">
-            <remote-destination host="localhost" port="4447"/>
-        </outbound-socket-binding>
-        <outbound-socket-binding name="remote-ejb-gs-ear-connection">
-            <remote-destination host="localhost" port="4447"/>
-        </outbound-socket-binding>
-        <outbound-socket-binding name="remote-ejb-omr-ear-connection">
-            <remote-destination host="localhost" port="4447"/>
-        </outbound-socket-binding>
-        <outbound-socket-binding name="remote-ejb-ibr-ear-connection">
-            <remote-destination host="localhost" port="4447"/>
-        </outbound-socket-binding>
-        <outbound-socket-binding name="remote-ejb-connection">
+        <outbound-socket-binding name="localhost-remote-ejb-connection">
             <remote-destination host="localhost" port="4447"/>
         </outbound-socket-binding>
     </socket-binding-group>
