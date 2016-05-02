@@ -199,7 +199,6 @@
                         <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
                     </validation>
                 </datasource>
-                <!-- GeometryServices -->
                 <datasource jndi-name="java:jboss/datasources/GdwRealmDS" pool-name="GdwRealmDS" enabled="true" use-java-context="true">
                     <connection-url>${jdbc.GdwRealmDS.connection}</connection-url>
                     <driver>oracle</driver>
@@ -445,6 +444,12 @@
                     </properties>
                 </remote-outbound-connection>
                 <remote-outbound-connection name="remote-ejb-iscpt-ear-connection" outbound-socket-binding-ref="localhost-remote-ejb-connection" username="ejbuser" security-realm="ApplicationRealm">
+                    <properties>
+                        <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
+                        <property name="SSL_ENABLED" value="false"/>
+                    </properties>
+                </remote-outbound-connection>
+                <remote-outbound-connection name="remote-ejb-dr-ear-connection" outbound-socket-binding-ref="localhost-remote-ejb-connection" username="ejbuser" security-realm="ApplicationRealm">
                     <properties>
                         <property name="SASL_POLICY_NOANONYMOUS" value="false"/>
                         <property name="SSL_ENABLED" value="false"/>
