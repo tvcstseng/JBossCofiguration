@@ -163,6 +163,33 @@
         <subsystem xmlns="urn:jboss:domain:cmp:1.1"/>
         <subsystem xmlns="urn:jboss:domain:datasources:1.2">
             <datasources>
+                <datasource jndi-name="java:jboss/datasources/DinoConversionDS" pool-name="DinoConversionDS" enabled="true" use-java-context="true">
+                    <connection-url>${jdbc.DinoConversionDS.connection}</connection-url>
+                    <connection-property name="oracle.jdbc.defaultNChar">
+                        true
+                    </connection-property>
+                    <driver>oracle</driver>
+                    <security>
+                        <user-name>${jdbc.DinoConversionDS.user-name}</user-name>
+                        <password>${jdbc.DinoConversionDS.password}</password>
+                    </security>
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
+                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
+                    </validation>
+                </datasource>
+                <datasource jndi-name="java:jboss/datasources/TcDataDS" pool-name="TcDataDS" enabled="true" use-java-context="true">
+                    <connection-url>${jdbc.TcDataDS.connection}</connection-url>
+                    <driver>oracle</driver>
+                    <security>
+                        <user-name>${jdbc.TcDataDS.user-name}</user-name>
+                        <password>${jdbc.TcDataDS.password}</password>
+                    </security>
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"/>
+                        <exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"/>
+                    </validation>
+                </datasource>
                 <datasource jta="true" jndi-name="java:jboss/datasources/BroDS" pool-name="BroDS" enabled="true" use-java-context="true" spy="false" use-ccm="true">
                     <connection-url>${jdbc.BroDS.connection}</connection-url>
                     <driver>oracle</driver>
@@ -493,6 +520,17 @@
                         <policy-module code="Delegating" flag="required"/>
                     </authorization>
                 </security-domain>
+                <security-domain name="DinoSecurityDomain">
+                    <authentication>
+                        <login-module code="Database" flag="required">
+                            <module-option name="dsJndiName" value="java:jboss/datasources/TcDataDS"/>
+                            <module-option name="principalsQuery" value="select user_pass from tomcat_users where user_name=?"/>
+                            <module-option name="rolesQuery" value="select role_name,'Roles' from tomcat_user_roles where user_name=?"/>
+                            <module-option name="hashEncoding" value="hex"/>
+                            <module-option name="hashAlgorithm" value="MD5"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
                 <security-domain name="BroWebserviceDomain">
                     <authentication>
                         <login-module code="org.jboss.security.auth.spi.DatabaseCertLoginModule" flag="required">
@@ -606,5 +644,4 @@
             <remote-destination host="localhost" port="4447"/>
         </outbound-socket-binding>
     </socket-binding-group>
-
 </server>
